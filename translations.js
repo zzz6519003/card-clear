@@ -27,7 +27,13 @@ const translations = {
         'newGame': 'New Game',
         'reset': 'Reset',
         'languageToggle': 'English',
-        'cheatMode': 'Cheat Mode'
+        'cheatMode': 'Cheat Mode',
+
+        // Game modes
+        'gameModeLabel': 'Game Mode:',
+        'mtgMode': 'Magic',
+        'pokemonMode': 'Pokémon',
+        'yugiohMode': 'Yu-Gi-Oh'
     },
     'zh': {
         // Page title and headings
@@ -57,7 +63,13 @@ const translations = {
         'newGame': '新游戏',
         'reset': '重置',
         'languageToggle': '中文',
-        'cheatMode': '作弊模式'
+        'cheatMode': '作弊模式',
+
+        // Game modes
+        'gameModeLabel': '游戏模式：',
+        'mtgMode': '万智牌',
+        'pokemonMode': '宝可梦',
+        'yugiohMode': '游戏王'
     }
 };
 
@@ -128,6 +140,19 @@ function updateGameUI() {
     // Update cheat mode button
     const cheatBtn = document.getElementById('cheatModeBtn');
     if (cheatBtn) cheatBtn.textContent = t('cheatMode');
+
+    // Update game mode buttons
+    const mtgBtn = document.getElementById('mtgModeBtn');
+    if (mtgBtn) mtgBtn.textContent = t('mtgMode');
+
+    const pokemonBtn = document.getElementById('pokemonModeBtn');
+    if (pokemonBtn) pokemonBtn.textContent = t('pokemonMode');
+
+    const yugiohBtn = document.getElementById('yugiohModeBtn');
+    if (yugiohBtn) yugiohBtn.textContent = t('yugiohMode');
+
+    const modeLabel = document.querySelector('.mode-label');
+    if (modeLabel) modeLabel.textContent = t('gameModeLabel');
 }
 
 // Initialize on page load

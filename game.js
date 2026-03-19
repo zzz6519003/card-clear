@@ -24,6 +24,10 @@ class Game {
         this.gameWon = false;
         this.cheatMode = false;
 
+        // Game mode
+        this.gameMode = localStorage.getItem('gameMode') || 'mtg';
+        this.cardAdapter = getCardAdapter(this.gameMode);
+
         this.boardElement = document.getElementById('gameBoard');
         this.loadingElement = document.getElementById('loading');
         this.boardContainer = document.getElementById('boardContainer');
@@ -31,6 +35,7 @@ class Game {
         this.statusElement = document.getElementById('gameStatus');
 
         this.attachEventListeners();
+        this.updateGameModeButtons();
         this.startNewGame();
     }
 
@@ -38,6 +43,11 @@ class Game {
         document.getElementById('newGameBtn').addEventListener('click', () => this.startNewGame());
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
         document.getElementById('cheatModeBtn').addEventListener('click', () => this.toggleCheatMode());
+
+        // Game mode buttons
+        document.getElementById('mtgModeBtn').addEventListener('click', () => this.setGameMode('mtg'));
+        document.getElementById('pokemonModeBtn').addEventListener('click', () => this.setGameMode('pokemon'));
+        document.getElementById('yugiohModeBtn').addEventListener('click', () => this.setGameMode('yugioh'));
     }
 
     async startNewGame() {
@@ -48,11 +58,11 @@ class Game {
         this.matchedPairs = 0;
         this.gameWon = false;
         this.gameInProgress = false;
-        
+
         this.showLoading();
-        
+
         try {
-            const cards = await this.fetchMTGCards(6); // 获取6张卡牌，共12对
+            const cards = await this.fetchCards(6);
             this.totalPairs = cards.length;
             this.initializeBoard(cards);
             this.render();
@@ -64,37 +74,27 @@ class Game {
         }
     }
 
-    async fetchMTGCards(count, retries = 3) {
+    async fetchCards(count, retries = 3) {
         const cards = [];
         const uniqueNames = new Set();
         let attempts = 0;
-        const maxAttempts = count * 5; // 防止无限循环
+        const maxAttempts = count * 10; // 防止无限循环
 
         while (cards.length < count && attempts < maxAttempts) {
             try {
-                const response = await fetch(SCRYFALL_API);
-                if (!response.ok) {
-                    if (response.status === 429) {
-                        // API 限流，等待
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        continue;
-                    }
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // 检查卡牌是否有图片
-                if (data.image_uris && data.image_uris.normal && !uniqueNames.has(data.name)) {
-                    cards.push(new MTGCard(data.name, data.image_uris.normal, data.id));
-                    uniqueNames.add(data.name);
+                const cardData = await this.cardAdapter.fetchCard();
+
+                // 检查卡牌是否是新的
+                if (cardData.imageUrl && !uniqueNames.has(cardData.name)) {
+                    cards.push(new MTGCard(cardData.name, cardData.imageUrl, cardData.id));
+                    uniqueNames.add(cardData.name);
                 }
             } catch (error) {
                 console.error('Error fetching card:', error);
                 attempts++;
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
-            
+
             attempts++;
         }
 
@@ -269,6 +269,28 @@ class Game {
         }
 
         this.render();
+    }
+
+    setGameMode(mode) {
+        if (mode !== this.gameMode) {
+            this.gameMode = mode;
+            this.cardAdapter = getCardAdapter(mode);
+            localStorage.setItem('gameMode', mode);
+            this.updateGameModeButtons();
+            this.startNewGame();
+        }
+    }
+
+    updateGameModeButtons() {
+        const mtgBtn = document.getElementById('mtgModeBtn');
+        const pokemonBtn = document.getElementById('pokemonModeBtn');
+        const yugiohBtn = document.getElementById('yugiohModeBtn');
+
+        [mtgBtn, pokemonBtn, yugiohBtn].forEach(btn => btn.classList.remove('active'));
+
+        if (this.gameMode === 'mtg' && mtgBtn) mtgBtn.classList.add('active');
+        else if (this.gameMode === 'pokemon' && pokemonBtn) pokemonBtn.classList.add('active');
+        else if (this.gameMode === 'yugioh' && yugiohBtn) yugiohBtn.classList.add('active');
     }
 
     showLoading() {
