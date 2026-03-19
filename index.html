@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTG Card Matching Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1>🎴 Card Matching</h1>
+                <button id="langToggle" class="btn btn-language">English</button>
+            </div>
+            <p class="subtitle">Dynamic Card Game with Scryfall API</p>
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="label">Score:</span>
+                    <span class="value" id="score">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Moves:</span>
+                    <span class="value" id="moves">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Remaining Pairs:</span>
+                    <span class="value" id="remaining">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Fetching cards from Scryfall...</p>
+        </div>
+
+        <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+        <div class="game-board-container" id="boardContainer" style="display: none;">
+            <div class="game-board" id="gameBoard"></div>
+        </div>
+
+        <div class="controls">
+            <button id="newGameBtn" class="btn btn-primary">New Game</button>
+            <button id="resetBtn" class="btn btn-secondary">Reset</button>
+            <button id="cheatModeBtn" class="btn btn-cheat">Cheat Mode</button>
+        </div>
+
+        <div class="game-status" id="gameStatus"></div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
+
