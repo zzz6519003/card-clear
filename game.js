@@ -23,6 +23,8 @@ class Game {
         this.gameInProgress = false;
         this.gameWon = false;
         this.cheatMode = false;
+        this.previewMode = false;
+        this.previewTimer = null;
 
         // Game mode
         this.gameMode = localStorage.getItem('gameMode') || 'mtg';
@@ -58,6 +60,12 @@ class Game {
         this.matchedPairs = 0;
         this.gameWon = false;
         this.gameInProgress = false;
+        this.previewMode = false;
+
+        // Clear any existing preview timer
+        if (this.previewTimer) {
+            clearTimeout(this.previewTimer);
+        }
 
         this.showLoading();
 
@@ -65,13 +73,27 @@ class Game {
             const cards = await this.fetchCards(6);
             this.totalPairs = cards.length;
             this.initializeBoard(cards);
-            this.render();
             this.hideLoading();
-            this.gameInProgress = true;
+            this.showPreview();
         } catch (error) {
             this.showError(t('fetchError') + error.message);
             console.error('API Error:', error);
         }
+    }
+
+    showPreview() {
+        // Show all cards flipped (face up) for 3 seconds
+        this.previewMode = true;
+        this.board.forEach(card => card.flipped = true);
+        this.render();
+
+        // After 3 seconds, flip cards back and start game
+        this.previewTimer = setTimeout(() => {
+            this.previewMode = false;
+            this.board.forEach(card => card.flipped = false);
+            this.gameInProgress = true;
+            this.render();
+        }, 3000);
     }
 
     async fetchCards(count, retries = 3) {
@@ -125,6 +147,11 @@ class Game {
 
     handleCardClick(cardIndex) {
         const card = this.board[cardIndex];
+
+        // 在预览模式下禁止点击卡牌
+        if (this.previewMode) {
+            return;
+        }
 
         // 在作弊模式下禁止点击卡牌
         if (this.cheatMode) {
@@ -255,6 +282,10 @@ class Game {
     }
 
     resetGame() {
+        // Clear any existing preview timer
+        if (this.previewTimer) {
+            clearTimeout(this.previewTimer);
+        }
         this.startNewGame();
     }
 
@@ -273,6 +304,11 @@ class Game {
 
     setGameMode(mode) {
         if (mode !== this.gameMode) {
+            // Clear any existing preview timer
+            if (this.previewTimer) {
+                clearTimeout(this.previewTimer);
+            }
+
             this.gameMode = mode;
             this.cardAdapter = getCardAdapter(mode);
             localStorage.setItem('gameMode', mode);
