@@ -38,7 +38,7 @@ class Game {
 
         this.attachEventListeners();
         this.updateGameModeButtons();
-        this.startNewGame();
+        // 不自动开始游戏，等待用户点击"新游戏"按钮
     }
 
     attachEventListeners() {
