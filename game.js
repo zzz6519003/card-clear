@@ -82,18 +82,54 @@ class Game {
     }
 
     showPreview() {
-        // Show all cards flipped (face up) for 3 seconds
+        // Show all cards flipped (face up)
         this.previewMode = true;
         this.board.forEach(card => card.flipped = true);
         this.render();
 
-        // After 3 seconds, flip cards back and start game
-        this.previewTimer = setTimeout(() => {
-            this.previewMode = false;
-            this.board.forEach(card => card.flipped = false);
-            this.gameInProgress = true;
-            this.render();
-        }, 3000);
+        // Wait for all card images to load before starting the timer
+        this.waitForImagesLoaded().then(() => {
+            // After 3 seconds, flip cards back and start game
+            this.previewTimer = setTimeout(() => {
+                this.previewMode = false;
+                this.board.forEach(card => card.flipped = false);
+                this.gameInProgress = true;
+                this.render();
+            }, 3000);
+        });
+    }
+
+    waitForImagesLoaded() {
+        return new Promise((resolve) => {
+            const images = this.boardElement.querySelectorAll('img');
+
+            if (images.length === 0) {
+                // No images to load
+                resolve();
+                return;
+            }
+
+            let loadedCount = 0;
+            const totalImages = images.length;
+
+            const checkAllLoaded = () => {
+                loadedCount++;
+                if (loadedCount === totalImages) {
+                    resolve();
+                }
+            };
+
+            images.forEach(img => {
+                if (img.complete) {
+                    // Image is already cached/loaded
+                    checkAllLoaded();
+                } else {
+                    // Wait for image to load or fail
+                    img.addEventListener('load', checkAllLoaded, { once: true });
+                    img.addEventListener('error', checkAllLoaded, { once: true });
+                }
+            });
+        });
     }
 
     async fetchCards(count, retries = 3) {
