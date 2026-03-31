@@ -25,6 +25,7 @@ class Game {
         this.cheatMode = false;
         this.previewMode = false;
         this.previewTimer = null;
+        this.isLoadingGame = false; // Prevent multiple simultaneous game loads
 
         // Game mode
         this.gameMode = localStorage.getItem('gameMode') || 'mtg';
@@ -53,6 +54,12 @@ class Game {
     }
 
     async startNewGame() {
+        // Prevent multiple simultaneous game loads
+        if (this.isLoadingGame) {
+            return;
+        }
+
+        this.isLoadingGame = true;
         this.board = [];
         this.selectedCards = [];
         this.score = 0;
@@ -61,6 +68,13 @@ class Game {
         this.gameWon = false;
         this.gameInProgress = false;
         this.previewMode = false;
+        this.cheatMode = false;
+
+        // Clear cheat mode button state
+        const cheatBtn = document.getElementById('cheatModeBtn');
+        if (cheatBtn) {
+            cheatBtn.classList.remove('active');
+        }
 
         // Clear any existing preview timer
         if (this.previewTimer) {
@@ -78,6 +92,8 @@ class Game {
         } catch (error) {
             this.showError(t('fetchError') + error.message);
             console.error('API Error:', error);
+        } finally {
+            this.isLoadingGame = false;
         }
     }
 

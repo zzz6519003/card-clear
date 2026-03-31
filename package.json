@@ -1,0 +1,18 @@
+{
+  "name": "mtg-card-matching-game",
+  "version": "1.0.0",
+  "description": "MTG Card Matching Game with E2E tests",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "serve": "vite",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}
