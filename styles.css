@@ -184,6 +184,9 @@ h1 {
     height: 100%;
     object-fit: cover;
     border-radius: 5px;
+    image-rendering: crisp-edges;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
 }
 
 .card:hover:not(.matched) {
