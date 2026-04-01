@@ -184,7 +184,9 @@ h1 {
     height: 100%;
     object-fit: cover;
     border-radius: 5px;
-    image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  image-rendering: auto;
+  transform-origin: center;
     backface-visibility: hidden;
 }
 
